@@ -7,18 +7,34 @@ let initialState= {
     { name: 'lettuce', category: 'produce', description: 'a description', price: 2.49, inventoryCount: 15 },
     { name: 'cucumber', category: 'produce', description: 'a description', price: 0.05, inventoryCount: 5 },
   ],
-  activeList: [{name:'Choose a Category.'}]
+  activeList: []
 };
 
 function productReducer(state = initialState, action) {
 
   let { type, payload } = action;
+  let { productList, activeList } = state;
 
   switch(type) {
     case 'UPDATE_ACTIVE_CATEGORY':
-      let {productList} = state
-      let activeList = productList.filter(item => item.category === payload);
+      activeList = productList.filter(item => item.category === payload);
       return {productList, activeList};
+    case 'ADD_ITEM_TO_CART':
+      productList = productList.map(product => {
+        if (product.name === payload) return {...product, inventoryCount: product.inventoryCount - 1};
+        else return product;
+      });
+      activeList = productList.filter(item => item.category === payload);
+      return {productList, activeList};
+    case 'REMOVE_ITEM_FROM_CART':
+      productList = productList.map(product => {
+        if (product.name === payload) return {...product, inventoryCount: product.inventoryCount + 1};
+        else return product;
+      });
+      activeList = productList.filter(item => item.category === payload);
+      return {productList, activeList};
+    case 'RESET_CART':
+      return initialState;
     default:
       return state;
   }
